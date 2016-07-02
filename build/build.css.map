@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAEA,UAEC;EADA,WAAW,EAAE,qBAAqB;AAGnC,IAAK;EACJ,gBAAgB,EAAE,mCAAmC",
+"sources": ["main.scss"],
+"names": [],
+"file": "build.css"
+}

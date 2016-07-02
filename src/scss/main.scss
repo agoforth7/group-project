@@ -1,0 +1,25 @@
+@import 'vars.scss';
+
+*, *:before, *:after {
+	box-sizing: border-box;
+}
+
+body {
+	background-image: url('assets/RijksLogoSideways.svg');
+	background-repeat: no-repeat;
+	background-size: 35%;
+	background-position: top right;
+	background-attachment: fixed;
+}
+
+#logo {
+	display: block;
+	padding: 1em;
+	width: 100%;
+	margin: 0 auto;
+}
+
+h2 {
+	text-align: center;
+	margin: .5em;
+}
