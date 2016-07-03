@@ -3,15 +3,16 @@
 
 body {
   background-image: url("assets/RijksLogoSideways.svg");
-  background-repeat: no-repeat;
+  background-repeat: no-repeat, no-repeat;
   background-size: 35%;
-  background-position: top right;
-  background-attachment: fixed; }
+  background-position: top right, right;
+  background-attachment: fixed;
+  background-color: #a2abad; }
 
 #logo {
   display: block;
   padding: 1em;
-  width: 100%;
+  width: 90%;
   margin: 0 auto; }
 
 h2 {
