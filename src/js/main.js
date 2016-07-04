@@ -10,16 +10,15 @@
 
 // req.send(null);
 
-
-// Each group of ten artworks is paginated by letter.
-// var index = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-// for (var i = 0; i < index.length; i++) {
-// 	str = index[i];
-// }
+var index = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var iterator = 0;
 
 var App = {
-	apiUrl: function (str) {
-		return 'https://www.rijksmuseum.nl/api/nl/collection?q=' + str + '&key=GIf851yx&format=json';
+	apiUrl: function () {
+
+		console.log( "INDEX: ", index[iterator] );
+		// Each group of ten artworks is paginated by letter.
+		return 'https://www.rijksmuseum.nl/api/nl/collection?q=' + index[iterator] + '&key=GIf851yx&format=json';
 	},
 	request: function (method, url, data, callback) {
 		var req = new XMLHttpRequest();
@@ -42,7 +41,6 @@ View.prototype.render = function () {};
 View.prototype.bindEvents = function () {};
 
 // AppView
-
 function AppView (data) {
 	View.call(this, data);
 	this.offset = 0;
@@ -55,27 +53,43 @@ AppView.prototype.render = function () {
 	var _this = this;
 	if (!_this.data) {
 		this.el.innerHTML = '<p>Loading</p>';
-		App.request('GET', App.apiUrl('A'), null, function (data) {
-			_this.data = data;
+		App.request('GET', App.apiUrl(), null, function (data) {
+			_this.data = data.artObjects;
 			_this.render();
 		});
 		return;
 	}
-	this.el.innerHTML = '<button class="see-more">See More Art!</button>';
-	this.renderThumbs();
+
+	this.el.innerHTML = `
+		<div class="thumbnailBoxes"></div>
+		<button class="see-more">See More Art!</button>
+	`;
+	this.renderThumbnailBoxes();
 	this.bindEvents();
 };
 
-AppView.prototype.renderThumbs = function () {
-	var group = this.el.querySelector('.thumbnail');
+AppView.prototype.renderThumbnailBoxes = function () {
+	var group = this.el.querySelector('.thumbnailBoxes');
+	group.classList.add('clearfix');
 	var length;
-	if (this.data.length > this.thumbsPerPage) {
+
+	// console.log( "this.data ", this.data );
+
+	if ( this.data.length > this.thumbsPerPage) {
 		length = this.thumbsPerPage;
+		// console.log( "First: ", this.data.length, length );
 	} else {
 		length = this.data.length;
+		// console.log( "Last: ", this.data.length, length );
 	}
+
+	console.log( length, this.data );
+
 	var view;
 	for (var i = this.offset; i < length + this.offset; i++) {
+
+		// console.log( i );
+
 		view = new ThumbView(this.data[i]);
 		group.appendChild(view.el);
 		view.render();
@@ -84,10 +98,13 @@ AppView.prototype.renderThumbs = function () {
 
 AppView.prototype.bindEvents = function () {
 	var _this = this;
-	var button = this.el.querySelector('button');
+	var button = this.el.querySelector('.see-more');
 	button.addEventListener('click', function () {
-		_this.offset += this.thumbsPerPage;
-		_this.renderThumbs();
+		iterator++;
+		// App.apiUrl();
+		this.thumbsPerPage += 10;
+		// _this.offset += this.thumbsPerPage;
+		_this.renderThumbnailBoxes();
 	});
 };
 
@@ -95,38 +112,49 @@ AppView.prototype.bindEvents = function () {
 
 function ThumbView (data) {
 	View.call(this, data, 'div');
+
+	// console.log( "Thumbview.constructor called" );
 }
 
 ThumbView.prototype = Object.create(View.prototype);
 
 ThumbView.prototype.render = function () {
 	var _this = this;
+	// console.log( "Thumbview.render called" );
 	if (typeof this.data === 'number') {
 		this.el.innerHTML = '<p>Loading</p>';
-		App.request('GET', App.apiUrl('item/' + this.data), null, function (data) {
+		App.request('GET', App.apiUrl(), null, function (data) {
 			_this.data = data;
+			// console.log( data );
 			_this.render();
 		});
 		return;
 	}
-	this.el.innerHTML = '<div class="thumbnail"><img src="App.ApiUrl()")>';
+	// console.log(this.data);
+	if (this.data.webImage === null) {
+		this.el.innerHTML = '<div class="thumbnail"><img src="build/assets/placeholder.svg"></div>';
+	} else {
+		this.el.innerHTML = '<div class="thumbnail"><img src="' + this.data.webImage.url + '"></div>';
+	}
 	this.bindEvents();
 };
 
 ThumbView.prototype.bindEvents = function () {
 	var _this = this;
-	var showDetail = this.el.querySelector('.detail');
+	var showDetail = this.el.querySelector('.thumbnail');
 	showDetail.addEventListener('click', function () {
 		_this.renderDetail();
 	});
 };
 
 ThumbView.prototype.renderDetail = function () {
-	var view;
-	for (var i = 0; i < this.data.kids.length; i++) {
-		view = new DetailView(this.data.kids[i]);
-		view.render();
-	}
+	var view = new DetailView(this.data);
+	// for (var i = 0; i < this.data.kids.length; i++) {
+	// 	view = new DetailView(this.data.kids[i]);
+	// 	view.render();
+	// }
+	console.log('renderDetail ' + view);
+	view.render();
 };
 
 // ThumbView
@@ -139,17 +167,29 @@ DetailView.prototype.render = function () {
 	var _this = this;
 	if (typeof this.data === 'number') {
 		this.el.innerHTML = '<p>Loading...</p>';
-		App.request('GET', App.apiUrl('item/' + this.data), null, function (data) {
+		App.request('GET', App.apiUrl(), null, function (data) {
 			_this.data = data;
 			_this.render();
 		});
 		return;
 	}
-	this.el.innerHTML = '<p>Title of Artwork</p><p>Artist Name</p><p>Date</p><p>Medium</p><p>Description</p>';
+	this.el.innerHTML = `
+		<div class="detail-view">
+			<p>${this.data.title}</p>
+			<p>${this.data.principalOrFirstMaker}</p>
+			<p>${this.data.}</p>
+			<p>Medium</p>
+			<p>Description</p>
+			<img class="bigPicture" src="' + this.data.webImage.url + '">
+		</div>
+	`;
 };
 
 var appView = new AppView();
 
+console.log( appView );
+
+// appView.bindEvents();
 appView.render();
 
 document.body.appendChild(appView.el);
