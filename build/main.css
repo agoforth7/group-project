@@ -6,16 +6,18 @@ body {
   background-repeat: no-repeat;
   background-size: 35%;
   background-position: top right;
-  background-attachment: fixed; }
+  background-attachment: fixed;
+  background-color: #a2abad; }
 
 #logo {
   display: block;
   padding: 1em;
-  width: 100%;
+  width: 90%;
   margin: 0 auto; }
 
 h2 {
   text-align: center;
-  margin: .5em; }
+  margin: .5em;
+  color: #D55140; }
 
 /*# sourceMappingURL=main.css.map */

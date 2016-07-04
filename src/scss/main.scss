@@ -10,16 +10,20 @@ body {
 	background-size: 35%;
 	background-position: top right;
 	background-attachment: fixed;
+	background-color: $color-lt-grey;
+	// background: linear-gradient(90deg, $color-dk-grey, $color-lt-grey);
+
 }
 
 #logo {
 	display: block;
 	padding: 1em;
-	width: 100%;
+	width: 90%;
 	margin: 0 auto;
 }
 
 h2 {
 	text-align: center;
 	margin: .5em;
+	color: $color-orange;
 }
