@@ -10,15 +10,14 @@
 
 // req.send(null);
 
-var index = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-var iterator = 0;
-
 var App = {
-	apiUrl: function () {
-
-		console.log( "INDEX: ", index[iterator] );
-		// Each group of ten artworks is paginated by letter.
-		return 'https://www.rijksmuseum.nl/api/nl/collection?q=' + index[iterator] + '&key=GIf851yx&format=json';
+	activeThumbnail: null,
+	apiUrl: function (p, ps) {
+		// Each group of ten artworks is paginated by number.
+		return 'https://www.rijksmuseum.nl/api/en/collection?p=' + p + '&ps=' + ps + '&key=GIf851yx&format=json';
+	},
+	apiDetailUrl: function (objNum) {
+		return 'https://www.rijksmuseum.nl/api/en/collection/' + objNum + '?key=GIf851yx&format=json';
 	},
 	request: function (method, url, data, callback) {
 		var req = new XMLHttpRequest();
@@ -43,8 +42,8 @@ View.prototype.bindEvents = function () {};
 // AppView
 function AppView (data) {
 	View.call(this, data);
-	this.offset = 0;
-	this.thumbsPerPage = 10;
+	this.pageNumber = 0;
+	this.pageSize = 10;
 }
 
 AppView.prototype = Object.create(View.prototype);
@@ -53,7 +52,7 @@ AppView.prototype.render = function () {
 	var _this = this;
 	if (!_this.data) {
 		this.el.innerHTML = '<p>Loading</p>';
-		App.request('GET', App.apiUrl(), null, function (data) {
+		App.request('GET', App.apiUrl(this.pageNumber, this.pageSize), null, function (data) {
 			_this.data = data.artObjects;
 			_this.render();
 		});
@@ -69,28 +68,31 @@ AppView.prototype.render = function () {
 };
 
 AppView.prototype.renderThumbnailBoxes = function () {
-	var group = this.el.querySelector('.thumbnailBoxes');
+	var _this = this
+	var group = _this.el.querySelector('.thumbnailBoxes');
 	group.classList.add('clearfix');
 	var length;
 
-	// console.log( "this.data ", this.data );
+	// console.log( "_this.data ", _this.data );
 
-	if ( this.data.length > this.thumbsPerPage) {
-		length = this.thumbsPerPage;
-		// console.log( "First: ", this.data.length, length );
-	} else {
-		length = this.data.length;
-		// console.log( "Last: ", this.data.length, length );
-	}
+	// if ( _this.data.length > _this.pageSize) {
+	// 	length = _this.pageSize;
+	// 	// console.log( "First: ", _this.data.length, length );
+	// } else {
+	// 	length = _this.data.length;
+	// 	// console.log( "Last: ", this.data.length, length );
+	// }
 
-	console.log( length, this.data );
+	// console.log( length, _this.data );
 
+
+	var offset = this.pageNumber * this.pageSize;
 	var view;
-	for (var i = this.offset; i < length + this.offset; i++) {
+
+	for (var i = offset; i < offset + this.pageSize; i++) {
 
 		// console.log( i );
-
-		view = new ThumbView(this.data[i]);
+		view = new ThumbView(_this.data[i]);
 		group.appendChild(view.el);
 		view.render();
 	}
@@ -100,11 +102,11 @@ AppView.prototype.bindEvents = function () {
 	var _this = this;
 	var button = this.el.querySelector('.see-more');
 	button.addEventListener('click', function () {
-		iterator++;
-		// App.apiUrl();
-		this.thumbsPerPage += 10;
-		// _this.offset += this.thumbsPerPage;
-		_this.renderThumbnailBoxes();
+		_this.pageNumber++;
+		App.request('GET', App.apiUrl(_this.pageNumber, _this.pageSize), null, function (data) {
+			_this.data = _this.data.concat(data.artObjects);
+			_this.renderThumbnailBoxes();
+		});
 	});
 };
 
@@ -120,6 +122,9 @@ ThumbView.prototype = Object.create(View.prototype);
 
 ThumbView.prototype.render = function () {
 	var _this = this;
+	var objNum = this.data.objectNumber;
+	this.el.classList.add('thumbView');
+	console.log(objNum);
 	// console.log( "Thumbview.render called" );
 	if (typeof this.data === 'number') {
 		this.el.innerHTML = '<p>Loading</p>';
@@ -143,21 +148,36 @@ ThumbView.prototype.bindEvents = function () {
 	var _this = this;
 	var showDetail = this.el.querySelector('.thumbnail');
 	showDetail.addEventListener('click', function () {
+		var detailViewEl;
+
+		// If there is an active thumbnail
+		if (App.activeThumbnail) {
+			// Get the child detail view
+			detailViewEl = App.activeThumbnail.el.querySelector('.detailView');
+			// Remove it from the DOM
+			detailViewEl.parentElement.removeChild(detailViewEl);
+			if (App.activeThumbnail === _this) {
+				// Toggle it off
+				App.activeThumbnail = null;
+				// Return early
+				return;
+			}
+		}
+
+		// If it's not the same one, show the next detail view
+		App.activeThumbnail = _this;
 		_this.renderDetail();
 	});
 };
 
 ThumbView.prototype.renderDetail = function () {
-	var view = new DetailView(this.data);
-	// for (var i = 0; i < this.data.kids.length; i++) {
-	// 	view = new DetailView(this.data.kids[i]);
-	// 	view.render();
-	// }
+	var view = new DetailView(this.data.objectNumber);
 	console.log('renderDetail ' + view);
 	view.render();
+	this.el.appendChild(view.el);
 };
 
-// ThumbView
+// DetailView
 
 function DetailView (data) {
 	View.call(this, data, 'div');
@@ -165,22 +185,23 @@ function DetailView (data) {
 
 DetailView.prototype.render = function () {
 	var _this = this;
-	if (typeof this.data === 'number') {
+	this.el.classList.add('detailView');
+	if (typeof this.data === 'string') {
 		this.el.innerHTML = '<p>Loading...</p>';
-		App.request('GET', App.apiUrl(), null, function (data) {
+		App.request('GET', App.apiDetailUrl(this.data), null, function (data) {
 			_this.data = data;
 			_this.render();
 		});
 		return;
 	}
+	console.log(this.data);
 	this.el.innerHTML = `
-		<div class="detail-view">
-			<p>${this.data.title}</p>
-			<p>${this.data.principalOrFirstMaker}</p>
-			<p>${this.data.}</p>
-			<p>Medium</p>
-			<p>Description</p>
-			<img class="bigPicture" src="' + this.data.webImage.url + '">
+		<div class="info">
+			<p>${this.data.artObject.title}</p>
+			<p>${this.data.artObject.principalOrFirstMaker}</p>
+			<p>${this.data.artObject.dating.year}</p>
+			<p>${this.data.artObject.description}</p>
+			<img class="bigPicture" src="${this.data.artObject.webImage.url}">
 		</div>
 	`;
 };

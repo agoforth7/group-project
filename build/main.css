@@ -1,3 +1,6 @@
+@font-face {
+  font-family: 'BerkshireSwash';
+  src: url("assets/BerkshireSwash-Regular.ttf"); }
 *, *:before, *:after {
   box-sizing: border-box; }
 
@@ -22,7 +25,8 @@ body {
 
 h2 {
   text-align: center;
-  margin: .5em; }
+  margin: .5em;
+  color: #D55140; }
 
 .thumbnailBoxes {
   width: 80%;
@@ -33,11 +37,29 @@ h2 {
   margin: 1em;
   width: 12em;
   height: 12em;
-  background-color: #fff;
+  background-color: #FFFFFF;
   float: left; }
 
-.thumbnail img {
+.thumbnail > img {
   width: 12em;
-  height: 12em; }
+  height: 12em;
+  border: 2px solid #FFFFFF;
+  box-shadow: 2px 2px 5px #404741; }
+
+.info > img {
+  width: 100%; }
+
+.see-more {
+  font-size: 1.5em;
+  font-family: 'BerkshireSwash', cursive;
+  text-shadow: 2px 2px 3px #333;
+  display: block;
+  margin: 0 auto;
+  padding: .5em 1.5em;
+  color: #FFFFFF;
+  background-color: #D55140;
+  margin-bottom: 2em;
+  margin-top: 1.5em;
+  border-radius: 20px; }
 
 /*# sourceMappingURL=main.css.map */
