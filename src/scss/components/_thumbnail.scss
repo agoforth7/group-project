@@ -1,0 +1,47 @@
+.thumbView {
+	
+}
+
+.thumbnailBoxes {
+	
+}
+
+
+.thumbnail {
+	float: left;
+	padding: 1em;
+	width: 100%;
+}
+
+.thumbnail-image {
+	cursor: pointer;
+	padding-bottom: 100%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	border: 2px solid $color-white;
+	box-shadow: 2px 2px 5px $color-md-grey;
+	transition: box-shadow 200ms ease-out;
+}
+
+.thumbnail-image:hover {
+	box-shadow: 4px 4px 10px $color-dk-grey;
+}
+
+@media (min-width: 600px) {
+	.thumbnailBoxes {
+		max-width: 900px;
+		width: 80%;
+		margin: 0 auto;
+	}
+
+	.thumbnail {
+		width: 50%;
+	}
+}
+
+@media (min-width: 900px) {
+	.thumbnail {
+		width: 33%;
+	}	
+}

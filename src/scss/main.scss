@@ -1,8 +1,20 @@
 @import 'vars.scss';
+@import 'components/thumbnail.scss';
+@import 'components/info.scss';
 
 @font-face {
   font-family: 'BerkshireSwash';
-  src: url('assets/BerkshireSwash-Regular.ttf');
+  src: url('assets/fonts/BerkshireSwash-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Lato-Bold';
+  src: url('assets/fonts/Lato-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Lato-Light';
+  src: url('assets/fonts/Lato-Light.ttf');
 }
 
 *, *:before, *:after {
@@ -22,6 +34,7 @@ body {
 	background-position: top right, right;
 	background-attachment: fixed;
 	background-color: $color-lt-grey;
+	font-family: 'Lato-Light', sans-serif;
 }
 
 #logo {
@@ -31,39 +44,24 @@ body {
 	margin: 0 auto;
 }
 
-h2 {
+h1 {
+	font-family: 'Lato-Bold', sans-serif;
 	text-align: center;
 	margin: .5em;
 	color: $color-orange;
 }
 
-.thumbnailBoxes {
-	width: 80%;
-	margin: 0 auto;
-	list-style-type: none;
+h3 {
+	font-family: 'Lato-Bold', sans-serif;
 }
 
-.thumbnail {
-	margin: 1em;
-	width: 12em;
-	height: 12em;
-	background-color: $color-white;
-	float: left;
-}
-
-.thumbnail > img {
-	width: 12em;
-	height: 12em;
-	border: 2px solid $color-white;
-	box-shadow: 2px 2px 5px $color-md-grey
-}
-
-// .detailView > img {
-// 	width: 100%;
-// }
-
-.info > img {
-	width: 100%;
+p.loader {
+	font-size: 1.5em;
+	font-family: 'BerkshireSwash', sans-serif;
+	color: $color-dk-grey;
+	clear: both;
+	margin: 1em 0;
+	text-align: center;
 }
 
 .see-more {
@@ -78,4 +76,9 @@ h2 {
 	margin-bottom: 2em;
 	margin-top: 1.5em;
 	border-radius: 20px;
+	outline: none;
+}
+
+.see-more:hover {
+	background-color: $color-blue;
 }

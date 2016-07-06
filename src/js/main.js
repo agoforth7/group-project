@@ -51,7 +51,7 @@ AppView.prototype = Object.create(View.prototype);
 AppView.prototype.render = function () {
 	var _this = this;
 	if (!_this.data) {
-		this.el.innerHTML = '<p>Loading</p>';
+		this.el.innerHTML = '<p class="loader">Loading</p>';
 		App.request('GET', App.apiUrl(this.pageNumber, this.pageSize), null, function (data) {
 			_this.data = data.artObjects;
 			_this.render();
@@ -72,19 +72,6 @@ AppView.prototype.renderThumbnailBoxes = function () {
 	var group = _this.el.querySelector('.thumbnailBoxes');
 	group.classList.add('clearfix');
 	var length;
-
-	// console.log( "_this.data ", _this.data );
-
-	// if ( _this.data.length > _this.pageSize) {
-	// 	length = _this.pageSize;
-	// 	// console.log( "First: ", _this.data.length, length );
-	// } else {
-	// 	length = _this.data.length;
-	// 	// console.log( "Last: ", this.data.length, length );
-	// }
-
-	// console.log( length, _this.data );
-
 
 	var offset = this.pageNumber * this.pageSize;
 	var view;
@@ -124,10 +111,10 @@ ThumbView.prototype.render = function () {
 	var _this = this;
 	var objNum = this.data.objectNumber;
 	this.el.classList.add('thumbView');
-	console.log(objNum);
+	// console.log(objNum);
 	// console.log( "Thumbview.render called" );
 	if (typeof this.data === 'number') {
-		this.el.innerHTML = '<p>Loading</p>';
+		this.el.innerHTML = '<p class="loader">Loading</p>';
 		App.request('GET', App.apiUrl(), null, function (data) {
 			_this.data = data;
 			// console.log( data );
@@ -137,9 +124,9 @@ ThumbView.prototype.render = function () {
 	}
 	// console.log(this.data);
 	if (this.data.webImage === null) {
-		this.el.innerHTML = '<div class="thumbnail"><img src="build/assets/placeholder.svg"></div>';
+		this.el.innerHTML = '<div class="thumbnail"><div class="thumbnail-image" style="background-image: url(build/assets/placeholder.svg)"></div>';
 	} else {
-		this.el.innerHTML = '<div class="thumbnail"><img src="' + this.data.webImage.url + '"></div>';
+		this.el.innerHTML = '<div class="thumbnail"><div class="thumbnail-image" style="background-image: url(' + this.data.webImage.url + ')"></div>';
 	}
 	this.bindEvents();
 };
@@ -172,7 +159,7 @@ ThumbView.prototype.bindEvents = function () {
 
 ThumbView.prototype.renderDetail = function () {
 	var view = new DetailView(this.data.objectNumber);
-	console.log('renderDetail ' + view);
+	// console.log('renderDetail ' + view);
 	view.render();
 	this.el.appendChild(view.el);
 };
@@ -187,7 +174,7 @@ DetailView.prototype.render = function () {
 	var _this = this;
 	this.el.classList.add('detailView');
 	if (typeof this.data === 'string') {
-		this.el.innerHTML = '<p>Loading...</p>';
+		this.el.innerHTML = '<p class="loader">Loading...</p>';
 		App.request('GET', App.apiDetailUrl(this.data), null, function (data) {
 			_this.data = data;
 			_this.render();
@@ -197,7 +184,7 @@ DetailView.prototype.render = function () {
 	console.log(this.data);
 	this.el.innerHTML = `
 		<div class="info">
-			<p>${this.data.artObject.title}</p>
+			<h3>${this.data.artObject.title}</h3>
 			<p>${this.data.artObject.principalOrFirstMaker}</p>
 			<p>${this.data.artObject.dating.year}</p>
 			<p>${this.data.artObject.description}</p>
@@ -214,51 +201,3 @@ console.log( appView );
 appView.render();
 
 document.body.appendChild(appView.el);
-
-
-
-
-
-
-
-// key = GIf851yx
-
-// // search the collection using a JSON call
-//       function search(query) {
-//         return $.getJSON("https://www.rijksmuseum.nl/api/nl/collection?q=Q&key=fpGQTuED&format=json".replace("Q", query));
-//       }
-
-//       // creates a thumbnail image for the specified art object
-//       function thumbnail(object) {
-//         return $("<div>")
-//           .addClass("thumb")
-//           .css("background-image", "url(" + object.webImage.url.replace("s0", "s128") +")");
-//       }
-
-//       // fire the search query
-//       search($("#query").val())
-//         .done(function(results) {
-//           $("#example3-container").empty();
-
-//           var $table = $("#example3-container");
-//           $table.html("");
-
-//           // create a row for each art object found
-//           $.each(results.artObjects, function(index, object) {
-//             console.log(object);   
-          
-//             var $row = $('<tr class="child"><td>' 
-//               + object.objectNumber
-//               +'</td><td class="thumbnail">'
-//               +'</td><td>'
-//               + object.title
-//               +'</td></tr>').appendTo($table);
-            
-//             $row.find(".thumbnail").append(thumbnail(object));
-
-//             // make each row clickable, navigating to the relevant page on the Rijksmuseum website
-//             $row.on("click", function() {
-//               document.location = object.links.web;
-//             });
-//           })
-//         });
